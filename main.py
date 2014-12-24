@@ -10,7 +10,7 @@ from PyQt4 import Qt, QtGui, phonon
 
 from moviepy.editor import *
 
-from src.mainwindow import Ui_MainWindow
+from mainwindow import Ui_MainWindow
 
 
 def on_add_caption_clicked(ui):
