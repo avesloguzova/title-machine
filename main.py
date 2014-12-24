@@ -5,10 +5,10 @@ import sys
 import os
 import os.path
 from multiprocessing import Process, Queue, Event
-from Queue import Full
+from Queue import Full, Empty
 from PyQt4 import Qt, QtGui, phonon
 
-from moviepy.editor import *
+import moviepy.editor as editor
 
 from mainwindow import Ui_MainWindow
 
@@ -45,7 +45,7 @@ def on_process_clicked(app, ui, orig_filename, result_filename, process, queue, 
                 ui.textbrowser_log.setPlainText(prev_log + log)
                 sb = ui.textbrowser_log.verticalScrollBar()
                 sb.setValue(sb.maximum())
-            return (log_filename, logfile)
+            return log_filename, logfile
         except IOError:
             return log
 
@@ -74,7 +74,7 @@ def on_process_clicked(app, ui, orig_filename, result_filename, process, queue, 
             pass
         finally:
             try:
-                map(lambda log: os.remove(log[0]), logs)
+                [os.remove(l[0]) for l in logs]
             except OSError:
                 pass
             ui.button_process.setEnabled(True)
@@ -82,59 +82,62 @@ def on_process_clicked(app, ui, orig_filename, result_filename, process, queue, 
     return handler
 
 
-def process_videoclip(queue, done_event):
-    while True:
-        (orig_filename, result_filename, titles) = queue.get()
-        src = VideoFileClip(orig_filename)
-        clips = [src]
-        for t in titles:
-            title, start_time, duration = t
-            clip = TextClip(title, fontsize=70, color="white")
-            clip = clip.set_pos("center").set_start(start_time).set_duration(duration)
-            clips.append(clip)
-        result = CompositeVideoClip(clips)
-        result.write_videofile(result_filename, write_logfile=True, temp_audiofile=result_filename + '.wav')
-        done_event.set()
+def process_videoclip(queue, done_event, finish_event):
+    while not finish_event.is_set():
+        try:
+            (orig_filename, result_filename, titles) = queue.get(False, 0.1)
+            src = editor.VideoFileClip(orig_filename)
+            clips = [src]
+            for elem in titles:
+                title, start_time, duration = elem
+                clip = editor.TextClip(title, fontsize=70, color="white")
+                clip = clip.set_pos("center").set_start(start_time).set_duration(duration)
+                clips.append(clip)
+            result = editor.CompositeVideoClip(clips)
+            result.write_videofile(result_filename, write_logfile=True, temp_audiofile=result_filename + '.wav')
+            done_event.set()
+        except Empty:
+            pass
 
 
-def on_app_quit(process, queue):
+def on_app_quit(process, queue, finish_event):
     def handler():
         queue.close()
-        process.terminate()
+        finish_event.set()
+        process.join()
 
     return handler
 
 
-if __name__ == '__main__':
+def main():
     if len(sys.argv) != 2:
         sys.exit("Usage: ./main.py <video file>")
     if not os.path.isfile(sys.argv[1]):
         sys.exit("Video file is not found")
-
     orig_filename = sys.argv[1]
     splitted = os.path.splitext(orig_filename)
     result_filename = splitted[0] + "_edited" + splitted[1]
-
     app = QtGui.QApplication([])
     app.setApplicationName("Title machine")
-
     window = QtGui.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(window)
-
-    q = Queue(1)
-    e = Event()
-    p = Process(target=process_videoclip, args=(q, e))
-    p.start()
-
-    ui.button_process.clicked.connect(on_process_clicked(app, ui, orig_filename, result_filename, p, q, e))
+    queue = Queue(1)
+    event = Event()
+    terminate_flag = Event()
+    process = Process(target=process_videoclip, args=(queue, event, terminate_flag))
+    process.start()
+    ui.button_process.clicked.connect(
+        on_process_clicked(app, ui, orig_filename, result_filename, process, queue, event))
     ui.button_add_caption.clicked.connect(on_add_caption_clicked(ui))
     ui.button_remove_caption.clicked.connect(on_remove_caption_clicked(ui))
-    app.lastWindowClosed.connect(on_app_quit(p, q))
-
+    app.lastWindowClosed.connect(on_app_quit(process, queue, terminate_flag))
     ui.video_player.load(phonon.Phonon.MediaSource(orig_filename))
     ui.textbrowser_log.setPlainText("Welcome to Title Machine!")
-
     window.show()
     app.exec_()
+
+
+if __name__ == '__main__':
+    main()
 
