@@ -4,8 +4,7 @@
 import sys
 import os
 import os.path
-from multiprocessing import Process, Queue, Event, Pool
-from Queue import Full, Empty
+from multiprocessing import Pool
 from PyQt4 import Qt, QtCore, QtGui, phonon
 
 import moviepy.editor as editor
@@ -22,12 +21,14 @@ def on_add_caption_clicked(ui):
             item = QtGui.QTableWidgetItem(prop)
             item.setFlags(Qt.Qt.ItemIsEditable | Qt.Qt.ItemIsEnabled | Qt.Qt.ItemIsSelectable)
             ui.table_captions.setItem(row, i, item)
+
     return handler
 
 
 def on_remove_caption_clicked(ui):
     def handler():
         ui.table_captions.removeRow(ui.table_captions.currentRow())
+
     return handler
 
 
@@ -35,7 +36,7 @@ def get_log_filenames(result_filename):
     return [result_filename + '.wav.log', result_filename + '.log']
 
 
-def on_process_clicked(app, ui, orig_filename, result_filename, pool):
+def on_process_clicked(ui, orig_filename, result_filename, pool):
     def handler():
         ui.button_process.setEnabled(False)
         ui.textbrowser_log.setPlainText("")
@@ -76,7 +77,7 @@ def process_videoclip(orig_filename, result_filename, titles):
 
 
 def on_log_dir_changed(watcher, result_filename):
-    def handler(path):
+    def handler():
         for log in get_log_filenames(result_filename):
             if os.path.exists(log):
                 watcher.addPath(log)
@@ -86,7 +87,7 @@ def on_log_dir_changed(watcher, result_filename):
     return handler
 
 
-def on_log_file_changed(ui, watcher):
+def on_log_file_changed(ui):
     def handler(path):
         try:
             with open(path) as logfile:
@@ -103,6 +104,7 @@ def on_app_quit(pool):
     def handler():
         pool.terminate()
         pool.join()
+
     return handler
 
 
@@ -127,11 +129,11 @@ def main():
     log_watcher = QtCore.QFileSystemWatcher([os.path.dirname(result_filename)])
 
     ui.button_process.clicked.connect(
-        on_process_clicked(app, ui, orig_filename, result_filename, pool))
+        on_process_clicked(ui, orig_filename, result_filename, pool))
     ui.button_add_caption.clicked.connect(on_add_caption_clicked(ui))
     ui.button_remove_caption.clicked.connect(on_remove_caption_clicked(ui))
     log_watcher.directoryChanged.connect(on_log_dir_changed(log_watcher, result_filename))
-    log_watcher.fileChanged.connect(on_log_file_changed(ui, log_watcher))
+    log_watcher.fileChanged.connect(on_log_file_changed(ui))
     app.lastWindowClosed.connect(on_app_quit(pool))
 
     ui.video_player.load(phonon.Phonon.MediaSource(orig_filename))
