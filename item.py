@@ -7,7 +7,7 @@ class Item(object):
     def __init__(self, text, start_time, duration, x, y):
         self.text = text
         self.start_time_as_number = start_time
-        self.durationtion_as_number = duration
+        self.duration_as_number = duration
         self.x = x
         self.y = y
 
@@ -17,7 +17,7 @@ class Item(object):
 
     @property
     def duration(self):
-        return msec_to_str(self._duration)
+        return msec_to_str(self.duration_as_number)
 
     @start_time.setter
     def start_time(self, value):
@@ -25,11 +25,11 @@ class Item(object):
 
     @duration.setter
     def duration(self, value):
-        self._duration = str_to_msec(value)
+        self.duration_as_number = str_to_msec(value)
 
     @property
     def end_time(self):
-        return self.start_time_as_number + self._duration
+        return self.start_time_as_number + self.duration_as_number
 
     @staticmethod
     def properties():
