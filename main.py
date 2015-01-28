@@ -84,7 +84,7 @@ def get_log_filenames(result_filename):
     return [result_filename + '.wav.log', result_filename + '.log']
 
 
-def on_process_clicked(app, ui, orig_filename, result_filename, pool):
+def on_process_clicked(ui, orig_filename, result_filename, pool):
     def handler():
         if not items:
             return
@@ -114,7 +114,6 @@ def process_videoclip(orig_filename, result_filename, titles):
         src = editor.VideoFileClip(orig_filename)
         clips = [src]
         for elem in titles:
-            print elem
             title, start_time, duration, x, y = elem
             clip = editor.TextClip(title, fontsize=50, color="white")
             clip = clip.set_position((x, y)).set_start(start_time).set_duration(duration)
@@ -122,7 +121,7 @@ def process_videoclip(orig_filename, result_filename, titles):
         result = editor.CompositeVideoClip(clips)
         result.write_videofile(result_filename, write_logfile=True, temp_audiofile=result_filename + '.wav')
         return True
-    except:
+    except Exception:
         return False
 
 
@@ -175,7 +174,7 @@ def on_video_tick(ui):
     def handler(pos):
         for i, item in enumerate(items):
             scene_item = ui.video_canvas.scene.item_at(i)
-            is_visible = item._start_time <= pos and item._end_time >= pos
+            is_visible = item.start_time_as_number <= pos and item.end_time >= pos
             scene_item.setVisible(is_visible)
 
     return handler
@@ -207,7 +206,7 @@ def main():
     log_watcher = QtCore.QFileSystemWatcher([os.path.dirname(result_filename)])
 
     ui.button_process.clicked.connect(
-        on_process_clicked(app, ui, orig_filename, result_filename, pool))
+        on_process_clicked(ui, orig_filename, result_filename, pool))
     ui.button_add_caption.clicked.connect(on_add_caption_clicked(ui))
     ui.button_remove_caption.clicked.connect(on_remove_caption_clicked(ui))
     ui.table_captions.cellChanged.connect(on_tablewidget_cell_changed(ui))

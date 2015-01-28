@@ -6,14 +6,14 @@ __author__ = 'av'
 class Item(object):
     def __init__(self, text, start_time, duration, x, y):
         self.text = text
-        self._start_time = start_time
-        self._duration = duration
+        self.start_time_as_number = start_time
+        self.durationtion_as_number = duration
         self.x = x
         self.y = y
 
     @property
     def start_time(self):
-        return msec_to_str(self._start_time)
+        return msec_to_str(self.start_time_as_number)
 
     @property
     def duration(self):
@@ -21,15 +21,15 @@ class Item(object):
 
     @start_time.setter
     def start_time(self, value):
-        self._start_time = str_to_msec(value)
+        self.start_time_as_number = str_to_msec(value)
 
     @duration.setter
     def duration(self, value):
         self._duration = str_to_msec(value)
 
     @property
-    def _end_time(self):
-        return self._start_time + self._duration
+    def end_time(self):
+        return self.start_time_as_number + self._duration
 
     @staticmethod
     def properties():
