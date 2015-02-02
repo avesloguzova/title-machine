@@ -12,12 +12,18 @@ import moviepy.editor as editor
 from item import Item
 from video import VideoCanvas
 from mainwindow import Ui_MainWindow
+from moviepy.video.io.ffmpeg_reader import ffmpeg_parse_infos
 
 
 items = []
 
 
 def on_add_caption_clicked(ui):
+    """
+
+    :param ui:
+    :return:
+    """
     def handler():
         cur_time = ui.video_canvas.media.currentTime()
         row = len(items)
@@ -49,6 +55,11 @@ def on_add_caption_clicked(ui):
 
 
 def on_remove_caption_clicked(ui):
+    """
+
+    :param ui:
+    :return:
+    """
     def handler():
         row = ui.table_captions.currentRow()
         ui.table_captions.removeRow(row)
@@ -60,6 +71,11 @@ def on_remove_caption_clicked(ui):
 
 
 def on_tablewidget_cell_changed(ui):
+    """
+
+    :param ui:
+    :return:
+    """
     def handler(row, col):
         prop = Item.properties()[col]
         item = items[row]
@@ -81,10 +97,23 @@ def on_tablewidget_cell_changed(ui):
 
 
 def get_log_filenames(result_filename):
+    """
+
+    :param result_filename:
+    :return:
+    """
     return [result_filename + '.wav.log', result_filename + '.log']
 
 
 def on_process_clicked(ui, orig_filename, result_filename, pool):
+    """
+
+    :param ui:
+    :param orig_filename:
+    :param result_filename:
+    :param pool:
+    :return:
+    """
     def handler():
         if not items:
             return
@@ -110,6 +139,13 @@ def on_process_clicked(ui, orig_filename, result_filename, pool):
 
 
 def process_videoclip(orig_filename, result_filename, titles):
+    """
+
+    :param orig_filename:
+    :param result_filename:
+    :param titles:
+    :return:
+    """
     try:
         src = editor.VideoFileClip(orig_filename)
         clips = [src]
@@ -126,6 +162,12 @@ def process_videoclip(orig_filename, result_filename, titles):
 
 
 def on_log_dir_changed(watcher, result_filename):
+    """
+
+    :param watcher:
+    :param result_filename:
+    :return:
+    """
     def handler(path):
         for log in get_log_filenames(result_filename):
             if os.path.exists(log):
@@ -137,6 +179,12 @@ def on_log_dir_changed(watcher, result_filename):
 
 
 def on_log_file_changed(ui, watcher):
+    """
+
+    :param ui:
+    :param watcher:
+    :return:
+    """
     def handler(path):
         try:
             with open(path) as logfile:
@@ -150,6 +198,12 @@ def on_log_file_changed(ui, watcher):
 
 
 def on_app_quit(ui, pool):
+    """
+
+    :param ui:
+    :param pool:
+    :return:
+    """
     def handler():
         pool.terminate()
         pool.join()
@@ -159,6 +213,11 @@ def on_app_quit(ui, pool):
 
 
 def on_video_state_changed(ui):
+    """
+
+    :param ui:
+    :return:
+    """
     def handler(new, old):
         is_enabled = new == phonon.Phonon.PausedState
         ui.button_add_caption.setEnabled(is_enabled)
@@ -171,16 +230,24 @@ def on_video_state_changed(ui):
 
 
 def on_video_tick(ui):
+    """
+
+    :param ui:
+    :return:
+    """
     def handler(pos):
         for i, item in enumerate(items):
             scene_item = ui.video_canvas.scene.item_at(i)
-            is_visible = item.start_time_as_number <= pos and item.end_time >= pos
-            scene_item.setVisible(is_visible)
+            scene_item.setVisible(item.is_visible(pos))
 
     return handler
 
 
 def main():
+    """
+
+    :return:
+    """
     if len(sys.argv) != 2:
         sys.exit("Usage: ./main.py <video file>")
     if not os.path.isfile(sys.argv[1]):
@@ -189,6 +256,11 @@ def main():
     orig_filename = os.path.abspath(sys.argv[1])
     splitted = os.path.splitext(orig_filename)
     result_filename = splitted[0] + "_edited" + splitted[1]
+
+    try:
+        ffmpeg_parse_infos(orig_filename)
+    except IOError:
+        sys.exit("Can't detect valid video in specified file")
 
     app = QtGui.QApplication([])
     app.setApplicationName("Title machine")
