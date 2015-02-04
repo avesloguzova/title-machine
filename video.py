@@ -5,6 +5,11 @@ from PyQt4 import QtCore, QtGui, phonon
 
 
 def msec_to_str(msec):
+    """
+    convert time from number representation to string
+    :param msec: time in millisecond
+    :return:
+    """
     hour = (msec / (60 * 60 * 1000))
     minute = (msec / (60 * 1000)) % 60
     second = (msec / 1000) % 60
@@ -12,6 +17,11 @@ def msec_to_str(msec):
 
 
 def str_to_msec(s):
+    """
+    Convert string representation of time to number
+    :param s: string
+    :return: time in millisecond
+    """
     ts, msec = s.split(".")
     msec = int(msec)
     t = datetime.strptime(str(ts), "%H:%M:%S")
@@ -21,12 +31,25 @@ def str_to_msec(s):
 
 
 class Scene(QtGui.QGraphicsScene):
+    """
+    Class graphic scene which is able to connect to the video widget,
+     show titles on it, and move them.
+    """
     def __init__(self):
+        """
+        Correctly initializes scene
+        """
         super(Scene, self).__init__()
         self.cur_item = None
         self.video_widget = None
 
     def item_at(self, pos):
+        """
+        Returns the element on the job position in the list of elements
+         At position 0 is the video
+        :param pos: position
+        :return: element
+        """
         return self.items(QtCore.Qt.AscendingOrder)[pos + 1]
 
     def set_video_widget(self, widget):
@@ -35,6 +58,11 @@ class Scene(QtGui.QGraphicsScene):
         return proxy
 
     def mousePressEvent(self, evt):
+        """
+        Handler mouse click on the canvas to support the move tool with the mouse
+        :param evt: Object of QGraphicsSceneEvent
+        :return: None
+        """
         items = self.items(evt.scenePos(), QtCore.Qt.IntersectsItemShape,
                            QtCore.Qt.DescendingOrder)
         for item in items:
@@ -43,6 +71,11 @@ class Scene(QtGui.QGraphicsScene):
                 return
 
     def mouseMoveEvent(self, evt):
+        """
+        Handler move mouse button on the canvas to support the move tool with the mouse.
+        :param evt: Object of QGraphicsSceneEvent
+        :return: None
+        """
         if not self.video_widget or not self.cur_item:
             return
 
@@ -51,11 +84,25 @@ class Scene(QtGui.QGraphicsScene):
             self.cur_item.setPos(pos)
 
     def mouseReleaseEvent(self, evt):
+        """
+        Handler release the mouse button to support the move tool with the mouse
+        :param evt: Object of QGraphicsSceneEvent
+        :return: None
+        """
         self.cur_item = None
 
 
 class VideoCanvas(QtGui.QGraphicsView):
+    """
+    Class canvas that displays the video and the titles on it
+    """
     def __init__(self):
+        """
+        Correctly initializes the canvas.
+         Disables this scroll.
+         Creates a scene and connects to it as a widget.
+        :return: None
+        """
         super(VideoCanvas, self).__init__()
         self.setFrameShape(QtGui.QFrame.NoFrame)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -70,11 +117,26 @@ class VideoCanvas(QtGui.QGraphicsView):
         self.setSceneRect(self.video_proxy.rect())
 
     def set_source(self, filename):
+        """
+        Specifies the video source
+        :param filename: name of file with video
+        :return:None
+        """
         self.media.setCurrentSource(phonon.Phonon.MediaSource(filename))
 
     def resizeEvent(self, evt):
+        """
+        Handler resize the canvas.
+         Correctly handles video scaling.
+        :param evt: Object of QResizeEvent
+        :return: None
+        """
         super(VideoCanvas, self).resizeEvent(evt)
         self.fitInView(self.video_proxy, QtCore.Qt.KeepAspectRatio)
 
     def cleanup(self):
+        """
+        Function for the correct release resources
+        :return: None
+        """
         self.scene.clear()

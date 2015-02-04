@@ -5,6 +5,7 @@ __author__ = 'av'
 
 class Item(object):
     """
+    Class represent title added to video
 
     """
     def __init__(self, text, start_time, duration, x, y):
@@ -16,9 +17,9 @@ class Item(object):
 
     def is_visible(self, pos):
         """
-
-        :param pos:
-        :return:
+        Check is title visible in position
+        :param pos: position
+        :return: True or False
         """
         return self._start_time <= pos and self._start_time + self._duration >= pos
 

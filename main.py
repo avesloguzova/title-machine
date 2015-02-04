@@ -20,9 +20,11 @@ items = []
 
 def on_add_caption_clicked(ui):
     """
-
-    :param ui:
-    :return:
+        Function prepared function witch handle click on add caption.
+        It creates a new entry in the list of titles and
+        adds a new title on video
+    :param ui: instance of Ui_MainWindow
+    :return: handler
     """
     def handler():
         cur_time = ui.video_canvas.media.currentTime()
@@ -56,12 +58,15 @@ def on_add_caption_clicked(ui):
 
 def on_remove_caption_clicked(ui):
     """
-
-    :param ui:
-    :return:
+    Function prepared function witch handle click on remove caption.
+    It removes the title with the video and the corresponding item from the list of titles
+    :param ui: instance of Ui_MainWindow
+    :return: handler for click on remove caption
     """
     def handler():
         row = ui.table_captions.currentRow()
+        if row == -1:
+            return
         ui.table_captions.removeRow(row)
         item = ui.video_canvas.scene.item_at(row)
         ui.video_canvas.scene.removeItem(item)
@@ -72,9 +77,9 @@ def on_remove_caption_clicked(ui):
 
 def on_tablewidget_cell_changed(ui):
     """
-
-    :param ui:
-    :return:
+        Function prepared function witch handle changing of tables cell.It ignores the change of x and y.
+    :param ui: instance of Ui_MainWindow
+    :return: handler for changing of tables cell
     """
     def handler(row, col):
         prop = Item.properties()[col]
@@ -98,21 +103,21 @@ def on_tablewidget_cell_changed(ui):
 
 def get_log_filenames(result_filename):
     """
-
-    :param result_filename:
-    :return:
+    Get names of logfiles for processing videp
+    :param result_filename: name of result file
+    :return: list of names
     """
     return [result_filename + '.wav.log', result_filename + '.log']
 
 
 def on_process_clicked(ui, orig_filename, result_filename, pool):
     """
-
-    :param ui:
-    :param orig_filename:
-    :param result_filename:
-    :param pool:
-    :return:
+    Function prepared function witch handle click on process button
+    :param ui: instance of Ui_MainWindow
+    :param orig_filename: name of original file
+    :param result_filename: name of result file
+    :param pool: pool for acync runnig of video processing
+    :return: handler of click on process button
     """
     def handler():
         if not items:
@@ -140,11 +145,11 @@ def on_process_clicked(ui, orig_filename, result_filename, pool):
 
 def process_videoclip(orig_filename, result_filename, titles):
     """
-
-    :param orig_filename:
-    :param result_filename:
-    :param titles:
-    :return:
+    Run process video by used moviepy
+    :param orig_filename: name of original file
+    :param result_filename: instance of Ui_MainWindow
+    :param titles: list of titles
+    :return: True if processing is successfully end
     """
     try:
         src = editor.VideoFileClip(orig_filename)
@@ -163,10 +168,11 @@ def process_videoclip(orig_filename, result_filename, titles):
 
 def on_log_dir_changed(watcher, result_filename):
     """
-
-    :param watcher:
-    :param result_filename:
-    :return:
+    Function returns the handler for QFileSystemWatcher which monitors does not appear in the directory
+    if any of the log files
+    :param watcher: instance of QFileSystemWatcher
+    :param result_filename: instance of Ui_MainWindow
+    :return: handler of changing directory with logs
     """
     def handler(path):
         for log in get_log_filenames(result_filename):
@@ -180,10 +186,11 @@ def on_log_dir_changed(watcher, result_filename):
 
 def on_log_file_changed(ui, watcher):
     """
-
-    :param ui:
-    :param watcher:
-    :return:
+    Returns the handler for QFileSystemWatcher that updates the text
+     field with logs when changing the corresponding log
+    :param ui: instance of Ui_MainWindow
+    :param watcher: instance of QFileSystemWatcher
+    :return: handler of changing in file with logs
     """
     def handler(path):
         try:
@@ -199,10 +206,11 @@ def on_log_file_changed(ui, watcher):
 
 def on_app_quit(ui, pool):
     """
-
-    :param ui:
-    :param pool:
-    :return:
+    Returns the handler terminate the application. It closes the thread pool
+     and correctly clears the scene with video
+    :param ui: instance of Ui_MainWindow
+    :param pool: instance of Pool
+    :return: handler of quit from application
     """
     def handler():
         pool.terminate()
@@ -214,9 +222,10 @@ def on_app_quit(ui, pool):
 
 def on_video_state_changed(ui):
     """
-
-    :param ui:
-    :return:
+    Returns the handler to change the state of the video file (play / pause).
+     It blocks the buttons while playing the file.
+    :param ui: instance of Ui_MainWindow
+    :return: handler
     """
     def handler(new, old):
         is_enabled = new == phonon.Phonon.PausedState
@@ -231,9 +240,10 @@ def on_video_state_changed(ui):
 
 def on_video_tick(ui):
     """
-
-    :param ui:
-    :return:
+    Returns the handler changes the self-timer video (works during playback).
+     It displays / hides the current title at the appropriate time.
+    :param ui: instance of Ui_MainWindow
+    :return: handler
     """
     def handler(pos):
         for i, item in enumerate(items):
@@ -245,8 +255,11 @@ def on_video_tick(ui):
 
 def main():
     """
-
-    :return:
+    The main function of the application.
+     Check the input file for correctness.
+     Creates the main window, the thread pool, etc.
+     Connects all handlers
+    :return: None
     """
     if len(sys.argv) != 2:
         sys.exit("Usage: ./main.py <video file>")
