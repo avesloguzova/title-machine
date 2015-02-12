@@ -131,17 +131,20 @@ def on_process_clicked(ui, orig_filename, result_filename, pool):
             titles.append((str(item.text), item.start_time,
                            item.duration, item.x, item.y))
 
-        timer = Qt.QTimer()
-        timer.setSingleShot(True)
-
-        def on_timeout():
-            ui.button_process.setEnabled(True)
-            ui.textbrowser_log.insertPlainText("Video ready")
-
-        timer.timeout.connect(on_timeout)
+        # timer = Qt.QTimer()
+        # timer.setSingleShot(True)
+        #
+        # def on_timeout():
+        # print("on timeout")
+        #     ui.button_process.setEnabled(True)
+        #     ui.textbrowser_log.insertPlainText("Video ready")
+        #
+        # timer.timeout.connect(on_timeout)
 
         def on_finish(result):
-            timer.start()
+            # timer.start()
+            # print("timer start")
+            ui.button_process.setEnabled(True)
             try:
                 [os.remove(l) for l in get_log_filenames(result_filename)]
             except OSError:
@@ -317,6 +320,7 @@ def main():
     ui.textbrowser_log.insertPlainText("Welcome to Title Machine!")
     ui.button_pause.click()
     window.show()
+
     app.exec_()
 
 
