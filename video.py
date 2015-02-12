@@ -1,33 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from datetime import time, datetime
+
 from PyQt4 import QtCore, QtGui, phonon
-
-
-def msec_to_str(msec):
-    """
-    convert time from number representation to string
-    :param msec: time in millisecond
-    :return:
-    """
-    hour = (msec / (60 * 60 * 1000))
-    minute = (msec / (60 * 1000)) % 60
-    second = (msec / 1000) % 60
-    return time(hour, minute, second).strftime("%H:%M:%S.") + str(msec % 1000)
-
-
-def str_to_msec(s):
-    """
-    Convert string representation of time to number
-    :param s: string
-    :return: time in millisecond
-    """
-    ts, msec = s.split(".")
-    msec = int(msec)
-    t = datetime.strptime(str(ts), "%H:%M:%S")
-    return t.hour * 60 * 60 * 1000 + \
-           t.minute * 60 * 1000 + \
-           t.second * 1000 + msec
 
 
 class Scene(QtGui.QGraphicsScene):

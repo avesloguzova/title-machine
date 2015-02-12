@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
 import sys
@@ -131,8 +131,17 @@ def on_process_clicked(ui, orig_filename, result_filename, pool):
             titles.append((str(item.text), item.start_time,
                            item.duration, item.x, item.y))
 
-        def on_finish(result):
+        timer = Qt.QTimer()
+        timer.setSingleShot(True)
+
+        def on_timeout():
             ui.button_process.setEnabled(True)
+            ui.textbrowser_log.insertPlainText("Video ready")
+
+        timer.timeout.connect(on_timeout)
+
+        def on_finish(result):
+            timer.start()
             try:
                 [os.remove(l) for l in get_log_filenames(result_filename)]
             except OSError:
@@ -195,7 +204,7 @@ def on_log_file_changed(ui, watcher):
     def handler(path):
         try:
             with open(path) as logfile:
-                ui.textbrowser_log.setPlainText(logfile.read())
+                ui.textbrowser_log.insertPlainText(logfile.read())
                 sb = ui.textbrowser_log.verticalScrollBar()
                 sb.setValue(sb.maximum())
         except IOError:
@@ -305,8 +314,8 @@ def main():
     log_watcher.fileChanged.connect(on_log_file_changed(ui, log_watcher))
     app.lastWindowClosed.connect(on_app_quit(ui, pool))
 
-    ui.textbrowser_log.setPlainText("Welcome to Title Machine!")
-
+    ui.textbrowser_log.insertPlainText("Welcome to Title Machine!")
+    ui.button_pause.click()
     window.show()
     app.exec_()
 
