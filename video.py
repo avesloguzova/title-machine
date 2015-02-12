@@ -15,6 +15,7 @@ class Scene(QtGui.QGraphicsScene):
         """
         super(Scene, self).__init__()
         self.cur_item = None
+        self.dpos = None
         self.video_widget = None
 
     def item_at(self, pos):
@@ -42,6 +43,7 @@ class Scene(QtGui.QGraphicsScene):
         for item in items:
             if item.isVisible() and item != self.video_widget:
                 self.cur_item = item
+                self.dpos = evt.scenePos() - item.scenePos()
                 return
 
     def mouseMoveEvent(self, evt):
@@ -53,8 +55,10 @@ class Scene(QtGui.QGraphicsScene):
         if not self.video_widget or not self.cur_item:
             return
 
-        pos = evt.scenePos()
-        if self.cur_item.isVisible() and self.video_widget.rect().contains(pos):
+        pos = evt.scenePos() - self.dpos
+        item_rect = self.cur_item.sceneBoundingRect()
+        item_rect.moveTo(pos)
+        if self.cur_item.isVisible() and self.video_widget.rect().contains(item_rect):
             self.cur_item.setPos(pos)
 
     def mouseReleaseEvent(self, evt):
