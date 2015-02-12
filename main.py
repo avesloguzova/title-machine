@@ -10,12 +10,22 @@ from PyQt4 import Qt, QtCore, QtGui, phonon
 import moviepy.editor as editor
 
 from item import Item
-from video import VideoCanvas, MySeekSlider
+from video import VideoCanvas, SeekSlider
 from mainwindow import Ui_MainWindow
 from moviepy.video.io.ffmpeg_reader import ffmpeg_parse_infos
 
 
 items = []
+
+
+class FlaggedTimer(Qt.QTimer):
+    def __init__(self):
+        super(FlaggedTimer, self).__init__()
+        self.flag = False
+
+    def setFlag(self, value):
+        self.flag = value
+
 
 
 def on_add_caption_clicked(ui):
@@ -131,20 +141,18 @@ def on_process_clicked(ui, orig_filename, result_filename, pool):
             titles.append((str(item.text), item.start_time,
                            item.duration, item.x, item.y))
 
-        # timer = Qt.QTimer()
-        # timer.setSingleShot(True)
-        #
-        # def on_timeout():
-        #     print("on timeout")
-        #     ui.button_process.setEnabled(True)
-        #     ui.textbrowser_log.insertPlainText("Video ready")
-        #
-        # timer.timeout.connect(on_timeout)
+        timer = FlaggedTimer()
+        def on_timeout():
+            if timer.flag:
+                ui.button_process.setEnabled(True)
+                ui.textbrowser_log.insertPlainText("Video ready")
+                timer.stop()
+
+        timer.timeout.connect(on_timeout)
+        timer.start(50)
 
         def on_finish(result):
-            # timer.start()
-            # print("timer start")
-            ui.button_process.setEnabled(True)
+            timer.setFlag(True)
             try:
                 [os.remove(l) for l in get_log_filenames(result_filename)]
             except OSError:
@@ -292,7 +300,7 @@ def main():
     ui = Ui_MainWindow()
     ui.setupUi(window)
 
-    ui.video_seek = MySeekSlider(ui.layoutWidget)
+    ui.video_seek = SeekSlider(ui.layoutWidget)
     ui.video_seek.setIconVisible(False)
     ui.video_seek.setPageStep(1000)
     ui.video_seek.setSingleStep(200)
