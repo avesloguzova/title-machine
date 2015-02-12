@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Thu Feb 12 20:40:06 2015
+# Created: Thu Feb 12 21:06:57 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(746, 362)
+        MainWindow.resize(710, 362)
         self.main_widget = QtGui.QWidget(MainWindow)
         self.main_widget.setObjectName(_fromUtf8("main_widget"))
         self.horizontalLayout = QtGui.QHBoxLayout(self.main_widget)
@@ -46,12 +46,9 @@ class Ui_MainWindow(object):
         self.h_layout_2.setObjectName(_fromUtf8("h_layout_2"))
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.h_layout_2.addItem(spacerItem)
-        self.button_play = QtGui.QPushButton(self.layoutWidget)
-        self.button_play.setObjectName(_fromUtf8("button_play"))
-        self.h_layout_2.addWidget(self.button_play)
-        self.button_pause = QtGui.QPushButton(self.layoutWidget)
-        self.button_pause.setObjectName(_fromUtf8("button_pause"))
-        self.h_layout_2.addWidget(self.button_pause)
+        self.button_play_pause = QtGui.QPushButton(self.layoutWidget)
+        self.button_play_pause.setObjectName(_fromUtf8("button_play_pause"))
+        self.h_layout_2.addWidget(self.button_play_pause)
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.h_layout_2.addItem(spacerItem1)
         self.v_layout_1.addLayout(self.h_layout_2)
@@ -104,8 +101,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "Title Machine", None))
-        self.button_play.setText(_translate("MainWindow", "Play", None))
-        self.button_pause.setText(_translate("MainWindow", "Pause", None))
+        self.button_play_pause.setText(_translate("MainWindow", "Play", None))
         self.button_add_caption.setText(_translate("MainWindow", "Add", None))
         self.button_remove_caption.setText(_translate("MainWindow", "Remove", None))
         item = self.table_captions.horizontalHeaderItem(0)

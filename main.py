@@ -271,6 +271,17 @@ def on_video_tick(ui):
     return handler
 
 
+def on_button_play_pause_clicked(ui):
+    def handler():
+        if ui.video_canvas.media.state() == phonon.Phonon.PausedState:
+            ui.button_play_pause.setText("Pause")
+            ui.video_canvas.media.play()
+        else:
+            ui.button_play_pause.setText("Play")
+            ui.video_canvas.media.pause()
+
+    return handler
+
 def main():
     """
     The main function of the application.
@@ -320,8 +331,7 @@ def main():
     ui.button_remove_caption.clicked.connect(on_remove_caption_clicked(ui))
     ui.table_captions.cellChanged.connect(on_tablewidget_cell_changed(ui))
 
-    ui.button_play.clicked.connect(ui.video_canvas.media.play)
-    ui.button_pause.clicked.connect(ui.video_canvas.media.pause)
+    ui.button_play_pause.clicked.connect(on_button_play_pause_clicked(ui))
     ui.video_canvas.media.stateChanged.connect(on_video_state_changed(ui))
     ui.video_canvas.media.tick.connect(on_video_tick(ui))
 
@@ -330,7 +340,7 @@ def main():
     app.lastWindowClosed.connect(on_app_quit(ui, pool))
 
     ui.textbrowser_log.insertPlainText("Welcome to Title Machine!")
-    ui.button_pause.click()
+    ui.video_canvas.media.pause()
     window.show()
 
     app.exec_()
