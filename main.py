@@ -22,9 +22,7 @@ class FlaggedTimer(Qt.QTimer):
     def __init__(self):
         super(FlaggedTimer, self).__init__()
         self.flag = False
-
-    def setFlag(self, value):
-        self.flag = value
+        self.result = None
 
 
 
@@ -145,14 +143,15 @@ def on_process_clicked(ui, orig_filename, result_filename, pool):
         def on_timeout():
             if timer.flag:
                 ui.button_process.setEnabled(True)
-                ui.textbrowser_log.insertPlainText("Video ready")
+                ui.textbrowser_log.insertPlainText(timer.result)
                 timer.stop()
 
         timer.timeout.connect(on_timeout)
         timer.start(50)
 
         def on_finish(result):
-            timer.setFlag(True)
+            timer.flag = True
+            timer.result = result
             try:
                 [os.remove(l) for l in get_log_filenames(result_filename)]
             except OSError:
@@ -181,9 +180,10 @@ def process_videoclip(orig_filename, result_filename, titles):
             clips.append(clip)
         result = editor.CompositeVideoClip(clips)
         result.write_videofile(result_filename, write_logfile=True, temp_audiofile=result_filename + '.wav')
-        return True
+        return "Video ready"
     except Exception:
-        return False
+        import traceback
+        return traceback.format_exc()
 
 
 def on_log_dir_changed(watcher, result_filename):
