@@ -114,3 +114,8 @@ class VideoCanvas(QtGui.QGraphicsView):
         :return: None
         """
         self.scene.clear()
+
+class MySeekSlider(phonon.Phonon.SeekSlider):
+    def paintEvent(self, evt):
+        super(MySeekSlider, self).paintEvent(evt)
+        self.mediaObject().tick.emit(self.mediaObject().currentTime())

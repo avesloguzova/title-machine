@@ -27,19 +27,6 @@
        <widget class="QWidget" name="layoutWidget">
         <layout class="QVBoxLayout" name="v_layout_1">
          <item>
-          <widget class="Phonon::SeekSlider" name="video_seek">
-           <property name="iconVisible">
-            <bool>false</bool>
-           </property>
-           <property name="pageStep">
-            <number>1000</number>
-           </property>
-           <property name="singleStep">
-            <number>200</number>
-           </property>
-          </widget>
-         </item>
-         <item>
           <layout class="QHBoxLayout" name="h_layout_2">
            <item>
             <spacer name="hspacer_1">
@@ -177,13 +164,6 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>Phonon::SeekSlider</class>
-   <extends>QWidget</extends>
-   <header location="global">phonon/seekslider.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

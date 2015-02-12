@@ -10,7 +10,7 @@ from PyQt4 import Qt, QtCore, QtGui, phonon
 import moviepy.editor as editor
 
 from item import Item
-from video import VideoCanvas
+from video import VideoCanvas, MySeekSlider
 from mainwindow import Ui_MainWindow
 from moviepy.video.io.ffmpeg_reader import ffmpeg_parse_infos
 
@@ -135,7 +135,7 @@ def on_process_clicked(ui, orig_filename, result_filename, pool):
         # timer.setSingleShot(True)
         #
         # def on_timeout():
-        # print("on timeout")
+        #     print("on timeout")
         #     ui.button_process.setEnabled(True)
         #     ui.textbrowser_log.insertPlainText("Video ready")
         #
@@ -244,8 +244,6 @@ def on_video_state_changed(ui):
         ui.button_add_caption.setEnabled(is_enabled)
         ui.button_remove_caption.setEnabled(is_enabled)
         ui.table_captions.setEnabled(is_enabled)
-        # NOTE: disable because it doesn't notify about position changes
-        ui.video_seek.setEnabled(not is_enabled)
 
     return handler
 
@@ -293,6 +291,12 @@ def main():
 
     ui = Ui_MainWindow()
     ui.setupUi(window)
+
+    ui.video_seek = MySeekSlider(ui.layoutWidget)
+    ui.video_seek.setIconVisible(False)
+    ui.video_seek.setPageStep(1000)
+    ui.video_seek.setSingleStep(200)
+    ui.v_layout_1.addWidget(ui.video_seek)
 
     ui.video_canvas = VideoCanvas()
     ui.video_canvas.set_source(orig_filename)

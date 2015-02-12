@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Thu Jan  1 09:18:36 2015
-# by: PyQt4 UI code generator 4.11.2
+# Created: Thu Feb 12 20:40:06 2015
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -17,13 +17,11 @@ except AttributeError:
 
 try:
     _encoding = QtGui.QApplication.UnicodeUTF8
-
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -44,12 +42,6 @@ class Ui_MainWindow(object):
         self.v_layout_1 = QtGui.QVBoxLayout(self.layoutWidget)
         self.v_layout_1.setMargin(0)
         self.v_layout_1.setObjectName(_fromUtf8("v_layout_1"))
-        self.video_seek = phonon.Phonon.SeekSlider(self.layoutWidget)
-        self.video_seek.setIconVisible(False)
-        self.video_seek.setPageStep(1000)
-        self.video_seek.setSingleStep(200)
-        self.video_seek.setObjectName(_fromUtf8("video_seek"))
-        self.v_layout_1.addWidget(self.video_seek)
         self.h_layout_2 = QtGui.QHBoxLayout()
         self.h_layout_2.setObjectName(_fromUtf8("h_layout_2"))
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
@@ -128,5 +120,3 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Y", None))
         self.button_process.setText(_translate("MainWindow", "PROCESS", None))
 
-
-from PyQt4 import phonon
