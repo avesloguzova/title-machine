@@ -9,13 +9,14 @@ from PyQt4 import Qt, QtCore, QtGui, phonon
 
 import moviepy.editor as editor
 
-from item import Item
+from item import Item, str_to_msec
 from video import VideoCanvas, SeekSlider
 from mainwindow import Ui_MainWindow
 from moviepy.video.io.ffmpeg_reader import ffmpeg_parse_infos
 
 
 items = []
+total_time = 0
 
 
 class FlaggedTimer(Qt.QTimer):
@@ -38,7 +39,8 @@ def on_add_caption_clicked(ui):
         cur_time = ui.video_canvas.media.currentTime()
         row = len(items)
         ui.table_captions.setRowCount(row + 1)
-        new_item = Item("Enter text here...", cur_time, 1000, 0, 0)
+        dt = total_time - cur_time
+        new_item = Item("Enter text here...", cur_time, (1000 if dt > 1000 else dt), 0, 0)
         items.append(new_item)
 
         f = QtGui.QFont()
@@ -58,7 +60,10 @@ def on_add_caption_clicked(ui):
 
         for i, prop in enumerate(Item.properties()):
             tw_item = QtGui.QTableWidgetItem(getattr(new_item, prop))
-            tw_item.setFlags(Qt.Qt.ItemIsEditable | Qt.Qt.ItemIsEnabled | Qt.Qt.ItemIsSelectable)
+            if prop not in ("x", "y"):
+                tw_item.setFlags(Qt.Qt.ItemIsEditable | Qt.Qt.ItemIsEnabled | Qt.Qt.ItemIsSelectable)
+            else:
+                tw_item.setFlags(Qt.Qt.ItemIsEnabled | Qt.Qt.ItemIsSelectable)
             ui.table_captions.setItem(row, i, tw_item)
 
     return handler
@@ -101,8 +106,13 @@ def on_tablewidget_cell_changed(ui):
             scene_item.setPlainText(item.text)
         else:
             try:
-                setattr(item, prop, tw_item.text())
-                on_video_tick(ui)(ui.video_canvas.media.currentTime())
+                time_in_msec = str_to_msec(tw_item.text())
+                if (prop == "start_time" and time_in_msec < total_time) \
+                    or (prop == "duration" and item._start_time + time_in_msec < total_time):
+                    setattr(item, prop, tw_item.text())
+                    on_video_tick(ui)(ui.video_canvas.media.currentTime())
+                else:
+                    tw_item.setText(str(getattr(item, prop)))
             except Exception:
                 tw_item.setText(str(getattr(item, prop)))
 
@@ -282,6 +292,10 @@ def on_button_play_pause_clicked(ui):
 
     return handler
 
+def on_video_total_time_changed(time):
+    global total_time
+    total_time = time
+
 def main():
     """
     The main function of the application.
@@ -334,6 +348,7 @@ def main():
     ui.button_play_pause.clicked.connect(on_button_play_pause_clicked(ui))
     ui.video_canvas.media.stateChanged.connect(on_video_state_changed(ui))
     ui.video_canvas.media.tick.connect(on_video_tick(ui))
+    ui.video_canvas.media.totalTimeChanged.connect(on_video_total_time_changed)
 
     log_watcher.directoryChanged.connect(on_log_dir_changed(log_watcher, result_filename))
     log_watcher.fileChanged.connect(on_log_file_changed(ui, log_watcher))
