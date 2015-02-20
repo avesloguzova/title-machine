@@ -258,7 +258,7 @@ def on_video_state_changed(ui):
     :return: handler
     """
     def handler(new, old):
-        is_enabled = new == phonon.Phonon.PausedState
+        is_enabled = new != phonon.Phonon.PlayingState
         ui.button_add_caption.setEnabled(is_enabled)
         ui.button_remove_caption.setEnabled(is_enabled)
         ui.table_captions.setEnabled(is_enabled)
@@ -283,7 +283,9 @@ def on_video_tick(ui):
 
 def on_button_play_pause_clicked(ui):
     def handler():
-        if ui.video_canvas.media.state() == phonon.Phonon.PausedState:
+        if ui.video_canvas.media.state() != phonon.Phonon.PlayingState:
+            if ui.video_canvas.media.state() == phonon.Phonon.BufferingState:
+                ui.textbrowser_log.append("Video in buffered state!")
             ui.button_play_pause.setText("Pause")
             ui.video_canvas.media.play()
         else:
