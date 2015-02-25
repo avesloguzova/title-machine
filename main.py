@@ -9,7 +9,7 @@ from PyQt4 import Qt, QtCore, QtGui, phonon
 
 import moviepy.editor as editor
 
-from item import Item, str_to_msec
+from item import Item, str_to_msec, msec_to_str
 from video import VideoCanvas, SeekSlider
 from mainwindow import Ui_MainWindow
 from moviepy.video.io.ffmpeg_reader import ffmpeg_parse_infos
@@ -274,6 +274,7 @@ def on_video_tick(ui):
     :return: handler
     """
     def handler(pos):
+        ui.time_label.setText(msec_to_str(pos))
         for i, item in enumerate(items):
             scene_item = ui.video_canvas.scene.item_at(i)
             scene_item.setVisible(item.is_visible(pos))

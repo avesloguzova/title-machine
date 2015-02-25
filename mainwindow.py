@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Thu Feb 12 21:06:57 2015
+# Created: Wed Feb 25 09:59:31 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -49,6 +49,9 @@ class Ui_MainWindow(object):
         self.button_play_pause = QtGui.QPushButton(self.layoutWidget)
         self.button_play_pause.setObjectName(_fromUtf8("button_play_pause"))
         self.h_layout_2.addWidget(self.button_play_pause)
+        self.time_label = QtGui.QLabel(self.layoutWidget)
+        self.time_label.setObjectName(_fromUtf8("time_label"))
+        self.h_layout_2.addWidget(self.time_label)
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.h_layout_2.addItem(spacerItem1)
         self.v_layout_1.addLayout(self.h_layout_2)
@@ -102,6 +105,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "Title Machine", None))
         self.button_play_pause.setText(_translate("MainWindow", "Play", None))
+        self.time_label.setText(_translate("MainWindow", "00:00", None))
         self.button_add_caption.setText(_translate("MainWindow", "Add", None))
         self.button_remove_caption.setText(_translate("MainWindow", "Remove", None))
         item = self.table_captions.horizontalHeaderItem(0)
